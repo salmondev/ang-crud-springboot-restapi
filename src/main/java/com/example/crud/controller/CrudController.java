@@ -80,6 +80,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -96,17 +97,24 @@ import com.example.crud.repository.CrudRepository;
 
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
-@RequestMapping("/api/v1")
+//@RequestMapping("/api/v1")
+@Controller()
 public class CrudController {
+
+	@RequestMapping(value = "/**/{[path:[^\\.]*}")
+	public String redirectUi() {
+		return "forward:index.html";
+	}
+
 	@Autowired
 	private CrudRepository crudRepository;
 
-	@GetMapping("/products")
+	@GetMapping("/api/v1/products")
 	public List<CrudEntity> getAllProducts() {
 		return crudRepository.findAll();
 	}
 
-	@GetMapping("/products/{id}")
+	@GetMapping("/api/v1/products/{id}")
 	public ResponseEntity<CrudEntity> getProductById(@PathVariable(value = "id") Long id)
 			throws ResourceNotFoundException {
 		CrudEntity product = crudRepository.findById(id)
@@ -114,12 +122,12 @@ public class CrudController {
 		return ResponseEntity.ok().body(product);
 	}
 
-	@PostMapping("/products")
+	@PostMapping("/api/v1/products")
 	public CrudEntity createProduct(@Valid @RequestBody CrudEntity product) {
 		return crudRepository.save(product);
 	}
 
-	@PutMapping("/products/{id}")
+	@PutMapping("/api/v1/products/{id}")
 	public ResponseEntity<CrudEntity> updateProduct(@PathVariable(value = "id") Long id,
 			@Valid @RequestBody CrudEntity productDetails) throws ResourceNotFoundException {
 		CrudEntity product = crudRepository.findById(id)
@@ -130,9 +138,8 @@ public class CrudController {
 		return ResponseEntity.ok(updatedProduct);
 	}
 
-	@DeleteMapping("/products/{id}")
-	public Map<String, Boolean> deleteProduct(@PathVariable(value = "id") Long id)
-			throws ResourceNotFoundException {
+	@DeleteMapping("/api/v1/products/{id}")
+	public Map<String, Boolean> deleteProduct(@PathVariable(value = "id") Long id) throws ResourceNotFoundException {
 		CrudEntity product = crudRepository.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Product not found for this id :: " + id));
 
